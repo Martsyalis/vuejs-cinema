@@ -1,12 +1,24 @@
 import Vue from "vue";
+import VueResource from 'vue-resource';
+import moment from 'moment-timezone'
 import "./style.scss";
-import genres from "./util/genres";
+
+import MovieFilter from './components/MovieFilter.vue'
+import MovieList from './components/MovieList.vue';
+Vue.use(VueResource);
+
+// add moment to the vue prototype so its accesible through out the project
+moment.tz.setDefault("UTC")
+Object.defineProperty(Vue.prototype, '$moment', { get() { return this.$root.moment} })
 
 new Vue({
   el: "#app",
   data:{
     genre: [], 
-    time: []
+    time: [],
+    movies: [],
+    moment,
+    day: moment()._d
   },
   methods:{
     checkFilter(category, title, checked){
@@ -21,91 +33,13 @@ new Vue({
     }
   },
   components: {
-    "movie-list": {
-      template: `<div id="movie-list">               
-        <div class="movie" v-for="movie in filteredMovies"> {{ movie.title }} </div>
-      </div>`,
-      props:['genre', 'time'],
-      computed: {
-        filteredMovies(){
-          return this.movies.filter(this.moviePassesGenreFilter)
-        }
-      },
-      methods: {
-        moviePassesGenreFilter(movie) {
-          return this.genre.length 
-          ? this.genre.find(genre => movie.genre === genre)
-          : true
-        }
-      },
-      data() {
-        return {
-          movies: [
-            {
-              title: "Fiction",
-              genre: genres.ANIMATION 
-            },
-            {
-              title: "home alone",
-              genre: genres.COMEDY 
-
-            },
-            {
-              title: "Austin",
-              genre: genres.CRIME 
-
-            }
-          ]
-        };
-      }
-    },
-    "movie-filter": {
-      data() {
-        return {
-          genres
-        };
-      },
-      template: `
-      <div id="movie-filter">
-        <h2>Filter results</h2>
-        <div class="filter-group">
-          <check-filter 
-            v-for="genre in genres" 
-            v-bind:title="genre"
-            v-on:check-filter="checkFilter"> </check-filter>
-        </div>
-      </div>
-      `,
-      methods:{
-        checkFilter(...args){
-          this.$emit('check-filter', ...args)
-        }
-      },
-      components: {
-        "check-filter": {
-          data() {
-            return {
-              checked: false
-            };
-          },
-          props: ["title"],
-          template: `
-            <div 
-            v-bind:class="{ 'check-filter' : true , active: checked }" 
-            v-on:click="checkFilter" >
-              <span class="checkbox"></span>
-              <span class="check-filter-title">{{ title }}</span>
-            </div>`
-          ,
-          methods: {
-            checkFilter() {
-              this.checked = !this.checked;
-              this.$emit('check-filter', 'genre', this.title, this.checked);
-            }
-          }
-        }
-      }
-    }
+    MovieList,
+    MovieFilter
   },
+  created(){
+    this.$http.get('/api').then(res => {
+      this.movies = res.data;
+    })
+  }
  
 });
