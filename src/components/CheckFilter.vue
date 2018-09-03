@@ -14,9 +14,10 @@
         checked: false
       };
     },
-    props: ["title"],
+    props: ['title', 'category'],
     methods: {
       checkFilter() {
+        console.log('in checkFilter');
         this.checked = !this.checked;
         this.$emit('check-filter', 'genre', this.title, this.checked);
       }

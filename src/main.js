@@ -22,6 +22,7 @@ new Vue({
   },
   methods:{
     checkFilter(category, title, checked){
+      console.log('in main.js')
       if(checked) {
         this[category].push(title)
       } else {

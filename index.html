@@ -19,7 +19,7 @@
         <h1>Vue.js Cinema</h1>
     </div>
     <div id="overview">
-        <div class="main">
+        <div class="main" v-on:check-filter="checkFilter">
             <movie-list
                 v-bind:day="day"
                 v-bind:movies="movies"
@@ -27,7 +27,6 @@
                 v-bind:time="time">
             </movie-list>
             <movie-filter 
-                v-on:check-filter="checkFilter"
                 v-bind:genre="genre" 
                 v-bind:time="time">
             </movie-filter>
